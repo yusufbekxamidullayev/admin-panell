@@ -6,14 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script defer src="./js/common.js"></script>
     <script defer src="./js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
 <body>
 
-    <div class="pt-[20px] flex items-center justify-between pr-[50px]">
-        <form class="w-[400px] mx-auto">
+    <div class="pt-[20px] flex flex-col items-center gap-[10px] md:flex-row items-center justify-between pr-[50px]">
+        <form class="max-w-[400px] w-full mx-auto ml-[20px] sm:ml-[300px]">
             <label for="default-search"
                 class="mb-2 text-sm font-medium text-gray-900 sr-only ">Search</label>
             <div class="relative">

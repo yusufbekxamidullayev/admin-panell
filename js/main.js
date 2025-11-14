@@ -1,16 +1,15 @@
 let teachers = document.getElementById("teachers");
 let addTeacherBtn = document.getElementById("add-teacher");
-let outerModal = document.getElementById("outer-modal");
-let innerModal = document.getElementById("inner-modal");
+
 
 let select = null;
 
 addTeacherBtn.addEventListener("click" , function(){
-    outerModal.classList.remove("hidden")
+    addOuterModal();
 })
 
 outerModal.addEventListener("click" , function(){
-    outerModal.classList.add("hidden");
+    removeOuterModal();
     select = null;
     innerModal[0].value = "";
     innerModal[1].value = "";
@@ -84,7 +83,7 @@ async function getTeachers() {
         });
 
         document.addEventListener('click', function (event) {
-            const btn = event.target.closest('.dropdown-btn');
+            let btn = event.target.closest('.dropdown-btn');
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 if (menu !== btn?.nextElementSibling) {
                     menu.classList.add('hidden');
@@ -92,9 +91,10 @@ async function getTeachers() {
             });
 
             if (btn) {
-                const menu = btn.nextElementSibling;
-                menu.classList.toggle('hidden');
+                let menu = btn.nextElementSibling;
+                menu.classList.remove('hidden');
                 event.stopPropagation();
+                event.preventDefault();
             } else {
                 document.querySelectorAll('.dropdown-menu').forEach(menu => {
                     menu.classList.add('hidden');
