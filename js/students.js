@@ -195,8 +195,6 @@
 
 
 
-
-
 let path = new URLSearchParams(location.search);
 let teacherId = path.get("teacherId");
 
@@ -212,20 +210,27 @@ addStudentBtn.addEventListener("click", function () {
   outerModal.classList.remove("hidden");
   select = null;
 
-  for (let i = 0; i < 11; i++) {
-    innerModal[i].value = "";
+  // Forma tozalash
+  for (let i = 0; i < innerModal.length; i++) {
+    if (innerModal[i].type === "checkbox") {
+      innerModal[i].checked = false;
+    } else {
+      innerModal[i].value = "";
+    }
   }
-  innerModal[11].checked = false;
 });
 
 outerModal.addEventListener("click", function () {
   outerModal.classList.add("hidden");
   select = null;
 
-  for (let i = 0; i < 11; i++) {
-    innerModal[i].value = "";
+  for (let i = 0; i < innerModal.length; i++) {
+    if (innerModal[i].type === "checkbox") {
+      innerModal[i].checked = false;
+    } else {
+      innerModal[i].value = "";
+    }
   }
-  innerModal[11].checked = false;
 });
 
 innerModal.addEventListener("click", function (e) {
@@ -242,35 +247,30 @@ async function getStudents() {
     let res = await axios.get(url);
     studentsContainer.innerHTML = "";
 
-    res.data.map(el => {
+    res.data.forEach(el => {
       studentsContainer.innerHTML += `
-      <div class="group relative max-w-[320px] w-full h-[290px] overflow-hidden rounded-lg shadow-md">
-        <img src="${el.avatar}" alt="avatar" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-
-        <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-
-          <button class="dropdown-btn ml-[230px] inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5" type="button">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 3">
-              <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
-            </svg>
-          </button>
-
-          <div class="dropdown-menu hidden absolute right-0 mt-2 w-28 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700">
-            <ul class="py-2 text-base px-[10px] text-gray-700 dark:text-gray-200">
-              <button onClick="editStudent(${el.id})"><p class="block px-4 py-2">Edit</p></button>
-              <button onClick="deleteStudent(${el.id})"><p class="block px-4 py-2 text-red-600">Delete</p></button>
-            </ul>
+        <div class="group relative max-w-[320px] w-full h-[290px] overflow-hidden rounded-lg shadow-md">
+          <img src="${el.avatar}" alt="avatar" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+          <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button class="dropdown-btn ml-[230px] inline-block text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5" type="button">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 16 3">
+                <path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu hidden absolute right-0 mt-2 w-28 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700">
+              <ul class="py-2 text-base px-[10px] text-gray-700 dark:text-gray-200">
+                <button onClick="editStudent(${el.id})"><p class="block px-4 py-2">Edit</p></button>
+                <button onClick="deleteStudent(${el.id})"><p class="block px-4 py-2 text-red-600">Delete</p></button>
+              </ul>
+            </div>
+            <h5 class="text-white text-lg font-semibold">${el.firstName} ${el.lastName}</h5>
+            <p class="text-gray-200 text-sm">${el.telegram}</p>
+            <a href="../pages/student-info.html?studentId=${el.id}"
+              class="mt-4 inline-block px-4 py-2 bg-white text-black rounded hover:bg-gray-200 transition">
+              Student Info
+            </a>
           </div>
-
-          <h5 class="text-white text-lg font-semibold">${el.firstName} ${el.lastName}</h5>
-          <p class="text-gray-200 text-sm">${el.telegram}</p>
-
-          <a href="../pages/student-info.html?studentId=${el.id}"
-            class="mt-4 inline-block px-4 py-2 bg-white text-black rounded hover:bg-gray-200 transition">
-            Student Info
-          </a>
-        </div>
-      </div>`;
+        </div>`;
     });
 
     document.addEventListener("click", function (event) {
@@ -289,9 +289,10 @@ async function getStudents() {
     });
 
   } catch (err) {
-    console.log(err);
+    console.log("Get students error:", err);
   }
 }
+
 getStudents();
 
 // ------------------- DELETE STUDENT --------------------
@@ -302,13 +303,13 @@ async function deleteStudent(id) {
       : `https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${id}`;
 
     await axios.delete(url);
-    getStudents();
+    await getStudents();
   } catch (err) {
-    console.log(err);
+    console.log("Delete student error:", err);
   }
 }
 
-// ------------------- SUBMIT (ADD or EDIT) --------------------
+// ------------------- SUBMIT (ADD yoki EDIT) --------------------
 innerModal.addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -329,20 +330,33 @@ innerModal.addEventListener("submit", async function (e) {
 
   try {
     if (select) {
-      await axios.put(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${select}`, options);
+      let url = teacherId
+        ? `https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers/${teacherId}/students/${select}`
+        : `https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${select}`;
+
+      await axios.put(url, options);
     } else {
-      await axios.post(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/`, options);
+      let url = teacherId
+        ? `https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers/${teacherId}/students/`
+        : `https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/`;
+
+      await axios.post(url, options);
     }
 
-    getStudents();
+    await getStudents();
     outerModal.classList.add("hidden");
     select = null;
 
-    for (let i = 0; i < 11; i++) innerModal[i].value = "";
-    innerModal[11].checked = false;
+    for (let i = 0; i < innerModal.length; i++) {
+      if (innerModal[i].type === "checkbox") {
+        innerModal[i].checked = false;
+      } else {
+        innerModal[i].value = "";
+      }
+    }
 
   } catch (err) {
-    console.log(err);
+    console.log("Submit student error:", err);
   }
 });
 
@@ -352,7 +366,11 @@ async function editStudent(id) {
   select = id;
 
   try {
-    let res = await axios.get(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${select}`);
+    let url = teacherId
+      ? `https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers/${teacherId}/students/${select}`
+      : `https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${select}`;
+
+    let res = await axios.get(url);
 
     innerModal[0].value = res.data.email;
     innerModal[1].value = res.data.firstName;
@@ -368,6 +386,6 @@ async function editStudent(id) {
     innerModal[11].checked = res.data.gender;
 
   } catch (err) {
-    console.log(err);
+    console.log("Edit student error:", err);
   }
 }
