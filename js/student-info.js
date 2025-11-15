@@ -48,14 +48,10 @@
 
 
 
-// students-info.js
+let params = new URLSearchParams(window.location.search);
+let studentId = params.get("studentId");
 
-// URLParams dan studentId olamiz
-const params = new URLSearchParams(window.location.search);
-const studentId = params.get("studentId");
-
-// HTMLdagi joy — student ma'lumotlari uchun
-const studentInfoContainer = document.getElementById("student-info");
+let studentInfoContainer = document.getElementById("student-info");
 
 async function getStudentInfo() {
     if (!studentId) {
@@ -64,11 +60,8 @@ async function getStudentInfo() {
     }
 
     try {
-        // API soʻrov — o‘zing ishlatayotgan mockapi manzilingni yoz
-        const res = await axios.get(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${studentId}`);
-        const el = res.data;
-
-        // Ma’lumotni HTMLga chiqarish
+        let res = await axios.get(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/students/${studentId}`);
+        let el = res.data;
         studentInfoContainer.innerHTML = `
                        <div class="relative flex w-[900px] h-[300px] bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
                          <div class="flex-1 p-6 flex flex-col justify-between">
