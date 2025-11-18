@@ -1,8 +1,11 @@
 let teachers = document.getElementById("teachers");
 let addTeacherBtn = document.getElementById("add-teacher");
-
-
+let search = document.getElementById("search-dropdown");
+let allTeachers = [];
 let select = null;
+let pagination = document.getElementById("pagination");
+let page = 1;
+let limit = 10;
 
 addTeacherBtn.addEventListener("click" , function(){
     addOuterModal();
@@ -33,11 +36,88 @@ innerModal.addEventListener("click" , function(e){
 
 async function getTeachers() {
     try {
-        let res = await axios("https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers/");
+        let res = await axios("https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers");
+        let resUI = await axios(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers?page=${page}&limit=${limit}`);
+        mapAllTeachers(teachers , resUI.data)
         console.log(res.data);
-        teachers.innerHTML = "";
-        res.data.map(el => {
-            teachers.innerHTML += `
+      let pageCount = Math.ceil(res.data.length / limit);
+      console.log(pageCount);
+      
+      pagination.innerHTML = `
+            <li>
+                <a href="#"
+                    class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading font-medium rounded-s-base text-sm px-3 h-9 focus:outline-none">Previous</a>
+            </li>
+`;
+
+      for(let i = 1; i <= pageCount; i++){
+        pagination.innerHTML += `
+           <li>
+            <button
+            onClick="passPage(${i})"
+            class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading font-medium text-sm w-9 h-9 focus:outline-none">${i}
+            </button>
+          </li>
+        `
+      }
+
+      pagination.innerHTML += `
+           <li>
+                <button
+                onClick="next(${page})"
+                    class="flex items-center justify-center text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading font-medium rounded-s-base text-sm px-3 h-9 focus:outline-none">Next</button>
+            </li>
+      `
+
+        document.addEventListener('click', function (event) {
+            let btn = event.target.closest('.dropdown-btn');
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu !== btn?.nextElementSibling) {
+                    menu.classList.add('hidden');
+                }
+            });
+
+            if (btn) {
+                let menu = btn.nextElementSibling;
+                menu.classList.remove('hidden');
+                event.stopPropagation();
+                event.preventDefault();
+            } else {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+getTeachers();
+
+async function passPage(page){
+  try {
+    let resUI = await axios(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers?page=${page}&limit=${limit}`);
+    mapAllTeachers(teachers, resUI.data)
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function next(page){
+  page = page + 1;
+  try{
+    let resUI = await axios(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers?page=${page}&limit=${limit}`);
+    mapAllTeachers(teachers , resUI.data)
+  }catch(err){
+    console.log(err);
+  }
+}
+
+function mapAllTeachers(content , data){
+  content.innerHTML = "";
+  data.map((el) => {
+    content.innerHTML += `
         <div class="border-[1px] max-w-[400px] w-full px-[10px] pt-[20px] rounded-[6px] dark:border-gray-800 mb-[20px]">
           <div class="flex justify-between">
             <div class="flex flex-col">
@@ -80,33 +160,8 @@ async function getTeachers() {
           </div>
         </div>
       `;
-        });
-
-        document.addEventListener('click', function (event) {
-            let btn = event.target.closest('.dropdown-btn');
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                if (menu !== btn?.nextElementSibling) {
-                    menu.classList.add('hidden');
-                }
-            });
-
-            if (btn) {
-                let menu = btn.nextElementSibling;
-                menu.classList.remove('hidden');
-                event.stopPropagation();
-                event.preventDefault();
-            } else {
-                document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                    menu.classList.add('hidden');
-                });
-            }
-        });
-
-    } catch (err) {
-        console.log(err);
-    }
+  });
 }
-getTeachers();
 
 async function deleteTeacher(id){
     try{
@@ -181,3 +236,17 @@ async function editTeacher(id){
         console.log(err);
     }
 }
+
+
+search.addEventListener("input" , async function(e){
+  let searchValue = e.target.value;
+  console.log(searchValue);
+
+  try{
+    let res = await axios.get(`https://69135d0ef34a2ff1170bb5ac.mockapi.io/Teachers?firstName=${searchValue}`);
+    mapAllTeachers(teachers , res.data)
+    console.log(res?.data);
+  }catch(err){
+    console.log(err);
+  }
+})
